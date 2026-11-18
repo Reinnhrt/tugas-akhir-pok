@@ -15,6 +15,9 @@
   [UBAH-ATURAN]   jumlah nyawa, jeda, perilaku soal salah
   [UBAH-SOAL]     daftar soal & jawaban
   [UBAH-TANGGA]   tinggi & jarak batu
+  [UBAH-MATERI]   isi menu Study Resources
+  [UBAH-MENU]     SEMUA pengaturan tampilan menu utama (latar, kartu, ikon, judul, tombol)
+  [UBAH-MENU-TEKS] tulisan menu: judul, subjudul, nama tombol, teks bawah
 -->
 <!-- [UBAH-JUDUL] -->
 <title>Panjat Tangga Organisasi Komputer</title>
@@ -23,13 +26,15 @@
 :root{--bg:#131313;--card:#8a5d5d;--text:#d3d3d3;--muted:#5d6f80;--btn:#e6edf5;--btnh:#d3e0ee;--ok:#2e9e5b;--bad:#d64545;--step:#8fa8c2;--sky:#cfe6fb;--acc:#2f6fb0;--acct:#fff;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 /* ===== [UBAH-WARNA] Mode gelap ===== */
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#587529;--card:#EDDA5E;--text:#142101;--muted:#ffffff;--btn:#5B6E2C;--btnh:#314252;--step:#4b6178;--sky:#1d2f40;--acc:#5a9ee0;--acct:#0d1620}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#587529;--card:#EDDA5E;--text:#142101;--muted:#142101;--btn:#5B6E2C;--btnh:#314252;--step:#4b6178;--sky:#1d2f40;--acc:#587529;--acct:#0d1620}}
 *{box-sizing:border-box}
-html,body{margin:0;  font-weight: bold;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+/* Posisi menu (atas/tengah/bawah) diatur dari MENU.posisi di bagian [UBAH-MENU] */
+#menu:not([hidden]){display:flex;flex-direction:column;justify-content:center;min-height:100vh;min-height:100dvh}
+html,body{margin:0;font-weight:bold;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
 .wrap{max-width:560px;margin:0 auto;padding:14px}
 .top{display:flex;justify-content:space-between;font-size:15px;margin-bottom:8px;color:var(--muted)}
 /* ===== [UBAH-UKURAN] Tinggi area tangga ===== */
-.stage{position:relative;height: 320px;background:var(--sky);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.stage{position:relative;height:300px;background:var(--sky);border-radius:16px;overflow:hidden;margin-bottom:12px}
 /* Dunia yang bergeser (kamera). Semua batu, bendera & karakter ada di dalamnya */
 #world{position:absolute;left:0;bottom:0;transition:transform .6s ease}
 /* Batu mengapung mentahan (tanpa gambar): bagian bawah meruncing. Diganti otomatis bila GAMBAR.batu diisi */
@@ -46,6 +51,22 @@ html,body{margin:0;  font-weight: bold;background:var(--bg);color:var(--text);fo
 .char.fall{transition:left .3s,bottom .9s cubic-bezier(.5,0,1,1),transform .9s;transform:rotate(200deg)}
 .flag{position:absolute;font-size:24px;line-height:1}
 .char img,.flag img{display:block}
+/* ===== [UBAH-KEMBALI] tombol "Kembali ke menu" (kotak sudut melengkung) ===== */
+.back{
+  font:inherit;
+  font-size:14px;                    /* ukuran tulisan */
+  background:var(--card);            /* warna kotak, mis. #ffffff */
+  color:var(--text);                 /* warna tulisan */
+  border:0px solid var(--muted);     /* garis tepi: tebal, jenis, warna. Ganti 0 untuk tanpa garis */
+  border-radius:12px;                /* kelengkungan sudut. Makin besar makin bulat, 0 = tajam */
+  padding:8px 14px;                  /* ruang dalam kotak: atas-bawah, kiri-kanan */
+  margin-bottom:10px;                /* jarak ke elemen di bawahnya */
+  cursor:pointer
+}
+details.card{padding:0;margin-bottom:8px}
+summary{padding:14px 16px;cursor:pointer;font-size:16px}
+details ul{margin:0;padding:0 16px 14px 36px;line-height:1.55;font-size:15px}
+.note{font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.4}
 .card{background:var(--card);border-radius:16px;padding:16px}
 /* ===== [UBAH-UKURAN] Tulisan soal & tombol jawaban ===== */
 .q{font-size:18px;line-height:1.45;margin:0 0 12px}
@@ -54,10 +75,74 @@ html,body{margin:0;  font-weight: bold;background:var(--bg);color:var(--text);fo
 .opt.ok{background:var(--ok);color:#fff}.opt.bad{background:var(--bad);color:#fff}
 .main{background:var(--acc);color:var(--acct);text-align:center;font-weight:600}
 .res{text-align:center}.res h2{margin:6px 0}.res p{color:var(--muted)}
+/* Elemen tambahan menu (subjudul & teks bawah). Gaya lainnya diatur dari [UBAH-MENU] di JS */
+#mSub,#mBawah{margin:4px 0 12px;line-height:1.4}
+#mBawah{margin:8px 0 0}
 </style>
+
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="menu">
+  <div class="card res" id="mKartu">
+    <div id="mIkon" style="font-size:54px">🧗</div>
+    <h2 id="tJudul"></h2>
+    <p id="mSub"></p>
+    <button class="opt main" id="bMulai"></button>
+    <button class="opt main" id="bBelajar"></button>
+    <p id="mBawah"></p>
+  </div>
+</div>
+<!-- [UBAH-MATERI] ringkasan materi (ditulis ulang dari buku). Salin satu blok <details> untuk menambah bab. -->
+<div class="wrap" id="study" hidden>
+  <button class="back" id="bKembali"></button>
+  
+  <details class="card"><summary>Bab I – Komputer dan Organisasi Komputer</summary><ul>
+    <li>Komputer menerima input, memprosesnya sesuai instruksi, menyimpan data, lalu menghasilkan output.</li>
+    <li>Lima unit utama: input, memori, ALU, output, dan unit kontrol.</li>
+    <li>Contoh input: keyboard, mouse, touchpad, webcam, light pen. Contoh output: monitor, printer.</li>
+    <li>ALU punya unit aritmetika dan unit logika Boolean. Unit kontrol mengatur kerja CPU dan mengambil serta mengenali instruksi.</li>
+    <li>Penyimpanan utama: RAM (baca-tulis) dan ROM (hanya baca).</li></ul></details>
+  <details class="card"><summary>Bab II – Kinerja dan Evolusi Komputer</summary><ul>
+    <li>Mesin IAS adalah komputer program tersimpan: memori utama, ALU, unit kontrol, dan I/O. Memorinya 1.000 word, tiap word 40 bit.</li>
+    <li>Register IAS: MBR, MAR, IR, IBR, PC, serta AC dan MQ untuk perkalian.</li>
+    <li>Jenis instruksi: transfer data, percabangan, aritmetika, dan pengubah alamat.</li>
+    <li>Generasi 2: transistor (1955–1965). Generasi 3: integrated circuit (1965–1980). Generasi 4: VLSI (1980–), ditandai mikroprosesor seperti Intel 4004.</li>
+    <li>Perancangan kinerja didorong aplikasi berat seperti pengolahan citra, pengenalan suara, dan video conference.</li></ul></details>
+  <details class="card"><summary>Bab III – Struktur CPU</summary><ul>
+    <li>Komponen CPU: ALU, unit kontrol, register (memori internal tercepat), dan interkoneksi CPU.</li>
+    <li>Siklus dasar: fetch (ambil instruksi), decode (artikan), execute (jalankan), lalu simpan hasil.</li>
+    <li>Interupsi menghentikan sementara program yang berjalan. Jenisnya: program, timer, I/O, dan kegagalan hardware.</li>
+    <li>Penanganan interupsi bisa berurutan (sequential) atau bersarang (nested).</li>
+    <li>Perkembangan modern: multi-core dan hyper-threading.</li></ul></details>
+  <details class="card"><summary>Bab IV – Memori Komputer</summary><ul>
+    <li>Hierarki memori: register, cache, RAM, lalu penyimpanan eksternal. Makin ke atas makin cepat, mahal per bit, dan kecil kapasitasnya.</li>
+    <li>Satuan dasar adalah bit (0 atau 1). Data dikelompokkan dalam word, misalnya 8, 16, atau 32 bit.</li>
+    <li>Jenis ROM: MROM, PROM, EPROM, EEPROM, dan Flash ROM.</li>
+    <li>Koreksi error memakai bit tambahan agar kesalahan bisa dideteksi dan diperbaiki.</li>
+    <li>Cache adalah memori kecil berkecepatan tinggi. Pemetaannya: direct-mapped, set-associative, dan fully associative.</li></ul></details>
+  <details class="card"><summary>Bab V – Magnetik Disk</summary><ul>
+    <li>Disk menyimpan data dalam track (lintasan melingkar) yang dibagi menjadi sector.</li>
+    <li>Access time disk mekanik terdiri dari waktu cari track, waktu putar ke sector, dan waktu transfer data.</li>
+    <li>Antarmuka: IDE/EIDE dan SCSI. Flashdisk adalah penyimpanan solid-state.</li>
+    <li>RAID: 0 striping (cepat, tanpa cadangan), 1 mirroring, 2 bit-level dengan ECC, 3 byte-level dengan parity khusus, 4 block-level dengan parity khusus, 5 parity tersebar, 6 dua parity tersebar.</li>
+    <li>Optik: CD-ROM, CD-R (sekali tulis, sekitar 650 MB), CD-RW (bisa ditulis ulang), dan DVD. Pita magnetik murah per gigabyte.</li></ul></details>
+  <details class="card"><summary>Bab VI – Unit Masukan dan Keluaran</summary><ul>
+    <li>Modul I/O menjembatani CPU dan memori dengan perangkat luar.</li>
+    <li>Fungsinya: kontrol dan pewaktuan, komunikasi dengan CPU, komunikasi dengan perangkat, buffering, dan deteksi kesalahan.</li>
+    <li>I/O terprogram membuat CPU menunggu sampai perangkat siap. Interrupt-driven I/O membiarkan CPU bekerja dan menunggu sinyal interupsi.</li>
+    <li>Mengenali sumber interupsi: banyak jalur interupsi, software poll, daisy chain, atau arbitrasi bus.</li>
+    <li>Chip pendukung: Intel 8259A (pengendali interupsi) dan Intel 8255A (programmable peripheral interface).</li></ul></details>
+  <details class="card"><summary>Bab VII – Sistem Bus dan Interkoneksi</summary><ul>
+    <li>Bus menghubungkan CPU, memori, dan modul I/O.</li>
+    <li>Tiga jenis saluran: bus data (membawa data), bus alamat (menentukan lokasi), dan bus kontrol (membawa sinyal kontrol).</li>
+    <li>Lebar bus data umumnya 8, 16, 32, atau 64 saluran.</li>
+    <li>Hierarki bus ganda mengurangi kemacetan karena perangkat cepat dan lambat dipisah.</li>
+    <li>Perancangan bus: jenis bus, arbitrasi (terpusat atau terdistribusi), dan timing (sinkron atau asinkron).</li>
+    <li>Contoh bus: ISA, PCI, dan USB.</li></ul></details>
+</div>
+
+<div class="wrap" id="game" hidden>
+  <button class="back" id="bMenu"></button>
   <div class="top"><span id="lives"></span><span id="prog"></span></div>
   <div class="stage" id="stage"></div>
   <div class="card" id="card"></div>
@@ -91,12 +176,82 @@ var TEKS={
   judulKalah:"Kamu terjatuh!",
   isiKalah:"Kesempatan habis di batu ke-",
   isiKalah2:". Ayo coba lagi!",
-  tombolUlang:"Main lagi"
+  tombolUlang:"Main lagi",
+  tombolKembali:"‹ Kembali ke menu"
+  // Tulisan menu utama (judul, tombol Start, dst.) ada di [UBAH-MENU-TEKS] di bawah
+};
+
+// ===== [UBAH-MENU-TEKS] tulisan di menu utama =====
+// Kosongkan ("") pada subjudul / teksBawah bila tidak ingin ditampilkan.
+var MENU_TEKS={
+  judul:"PENGANTAR ORGANISASI KOMPUTER",
+  subjudul:"",                    // tulisan kecil di bawah judul, mis. "Kuis panjat tangga"
+  tombolMulai:"Start Game ▶",
+  tombolBelajar:"Study Resources 📚",
+  teksBawah:""                    // tulisan kecil di bagian paling bawah kartu, mis. "Dibuat oleh ..."
+};
+
+// ===== [UBAH-MENU] semua pengaturan tampilan menu utama =====
+// Kosongkan ("") untuk memakai bawaan / warna tema. Angka dalam piksel kecuali dinyatakan lain.
+var MENU={
+  // --- Halaman menu (di belakang kartu) ---
+  posisi:"tengah",        // "atas", "tengah", atau "bawah": posisi kartu menu di layar
+  latarGambar:"",         // gambar latar halaman menu, mis. "latar-menu.jpg" (kosong = polos)
+  latarWarna:"",          // warna latar halaman menu, mis. "#131313" (kosong = ikut tema)
+  latarFoto:"cover",      // "cover" (penuh), "contain" (utuh), atau "100% 100%" (tarik) untuk gambar latar
+
+  // --- Kartu menu ---
+  lebarKartu:560,         // lebar maksimum kartu (px)
+  kartuWarna:"",          // warna kartu, mis. "#8a5d5d" (kosong = ikut tema)
+  kartuTransparan:1,      // 0 sampai 1: 1 = pekat, 0.5 = setengah tembus, 0 = tak terlihat
+  kartuSudut:16,          // kebulatan sudut kartu (px), 0 = siku
+  kartuIsi:16,            // ruang dalam kartu (px)
+  kartuBingkaiTebal:0,    // tebal garis tepi kartu (px), 0 = tanpa garis
+  kartuBingkaiWarna:"#ffffff", // warna garis tepi kartu
+
+  // --- Ikon di atas judul ---
+  ikonTampil:false,        // true = tampil, false = sembunyikan
+  ikonGambar:"",          // gambar ikon, mis. "logo.png" (kosong = pakai emoji di bawah)
+  ikonEmoji:"",         // emoji ikon bila ikonGambar kosong
+  ikonUkuran:54,          // ukuran ikon (px)
+
+  // --- Judul ---
+  judulUkuran:24,         // ukuran huruf judul (px)
+  judulWarna:"",          // warna judul (kosong = ikut tema)
+  judulRata:"center",     // "left", "center", atau "right"
+
+  // --- Subjudul & teks bawah ---
+  subjudulUkuran:15,
+  subjudulWarna:"",       // kosong = warna redup tema
+  teksBawahUkuran:13,
+  teksBawahWarna:"",      // kosong = warna redup tema
+
+  // --- Tombol (berlaku untuk kedua tombol) ---
+  tombolUkuran:16,        // ukuran huruf tombol (px)
+  tombolTinggi:13,        // ruang atas-bawah dalam tombol (px), makin besar makin tinggi
+  tombolSudut:12,         // kebulatan sudut tombol (px)
+  tombolJarak:8,          // jarak antar tombol (px)
+  tombolRata:"center",    // "left", "center", atau "right": posisi tulisan dalam tombol
+  tombolLebar:"100%",     // "100%" = selebar kartu, atau mis. "70%", "240px"
+  tombolRataTombol:"center", // "left", "center", "right": posisi tombol bila lebarnya kurang dari 100%
+
+  // --- Tombol Start Game ---
+  mulaiTampil:true,
+  mulaiIkon:"",           // emoji di depan tulisan, mis. "▶️ " (kosong = tanpa ikon)
+  mulaiWarna:"#323D25",          // warna tombol, mis. "#2f6fb0" (kosong = ikut tema)
+  mulaiWarnaTeks:"#ffff",      // warna tulisan tombol (kosong = ikut tema)
+
+  // --- Tombol Study Resources ---
+  belajarTampil:true,
+  belajarIkon:"",         // mis. "📚 "
+  belajarWarna:"#323D25",
+  belajarWarnaTeks:"#ffff"
 };
 
 // ===== [UBAH-ATURAN] =====
 var MAXLIFE=3;        // jumlah kesempatan salah
 var JEDA=1100;        // jeda (milidetik) sebelum soal berikutnya
+var MULAI_DI_BATU=0;  // untuk PREVIEW: isi 15 (sejumlah soal) agar langsung di puncak & lihat bendera; kembalikan ke 0 setelah selesai
 var ULANG_SOAL_SALAH=true;  // true = soal salah diulang di akhir; false = dilewati
 
 // ===== [UBAH-ANIMASI] =====
@@ -175,7 +330,7 @@ function buildStage(){
   c.style.setProperty("--lompat",TINGGI_LOMPAT+"px");
   c.innerHTML='<span class="body" id="charBody"></span>';w.appendChild(c);
   sprite(false);
-  w.style.transition="none";place(0,false);void w.offsetWidth;w.style.transition="";
+  w.style.transition="none";place(st.p,false);void w.offsetWidth;w.style.transition="";
 }
 function place(p,lompat){
   var c=document.getElementById("char");
@@ -190,7 +345,9 @@ function place(p,lompat){
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
 function start(){
   st={p:0,life:MAXLIFE,queue:shuffle(BANK.map(function(_,i){return i}))};
-  buildStage();ask();
+  st.p=Math.min(MULAI_DI_BATU,N);
+  buildStage();
+  if(st.p>=N){end(true)}else{ask()}
 }
 function hud(){
   document.getElementById("lives").textContent=TEKS.nyawa+TEKS.ikonNyawaPenuh.repeat(st.life)+TEKS.ikonNyawaKosong.repeat(MAXLIFE-st.life);
@@ -237,7 +394,110 @@ function end(win){
   },win?600:1000);
 }
 window.addEventListener("resize",function(){if(st)cam(st.p)});
-start();
+
+// ===== Menu =====
+function $(id){return document.getElementById(id)}
+
+// Mengubah warna "#rrggbb" + transparansi menjadi rgba(). Dipakai untuk MENU.kartuTransparan.
+function warnaTransparan(hex,a){
+  var m=/^#?([0-9a-f]{6})$/i.exec(hex);
+  if(!m)return hex;
+  var n=parseInt(m[1],16);
+  return "rgba("+(n>>16&255)+","+(n>>8&255)+","+(n&255)+","+a+")";
+}
+
+// Menerapkan semua pengaturan [UBAH-MENU] ke tampilan menu
+function terapkanMenu(){
+  var M=MENU, wrap=$("menu"), kartu=$("mKartu");
+
+  // posisi kartu di layar
+  wrap.style.justifyContent={atas:"flex-start",tengah:"center",bawah:"flex-end"}[M.posisi]||"center";
+  wrap.style.maxWidth=M.lebarKartu+"px";
+
+  // kartu
+  if(M.kartuWarna){
+    kartu.style.background=(M.kartuTransparan<1)?warnaTransparan(M.kartuWarna,M.kartuTransparan):M.kartuWarna;
+  }else if(M.kartuTransparan<1){
+    kartu.style.opacity=M.kartuTransparan;
+  }
+  kartu.style.borderRadius=M.kartuSudut+"px";
+  kartu.style.padding=M.kartuIsi+"px";
+  kartu.style.border=M.kartuBingkaiTebal?M.kartuBingkaiTebal+"px solid "+M.kartuBingkaiWarna:"0";
+
+  // ikon
+  var ik=$("mIkon");
+  ik.style.display=M.ikonTampil?"":"none";
+  ik.style.fontSize=M.ikonUkuran+"px";
+  if(M.ikonGambar)ik.innerHTML='<img src="'+M.ikonGambar+'" alt="" style="height:'+M.ikonUkuran+'px">';
+  else ik.textContent=M.ikonEmoji;
+
+  // judul
+  var j=$("tJudul");
+  j.textContent=MENU_TEKS.judul;
+  j.style.fontSize=M.judulUkuran+"px";
+  j.style.textAlign=M.judulRata;
+  if(M.judulWarna)j.style.color=M.judulWarna;
+
+  // subjudul
+  var sj=$("mSub");
+  sj.textContent=MENU_TEKS.subjudul;
+  sj.style.display=MENU_TEKS.subjudul?"":"none";
+  sj.style.fontSize=M.subjudulUkuran+"px";
+  sj.style.color=M.subjudulWarna||"var(--muted)";
+  sj.style.textAlign=M.judulRata;
+
+  // teks bawah
+  var tb=$("mBawah");
+  tb.textContent=MENU_TEKS.teksBawah;
+  tb.style.display=MENU_TEKS.teksBawah?"":"none";
+  tb.style.fontSize=M.teksBawahUkuran+"px";
+  tb.style.color=M.teksBawahWarna||"var(--muted)";
+
+  // tombol
+  var daftar=[
+    {el:$("bMulai"),   teks:MENU_TEKS.tombolMulai,   tampil:M.mulaiTampil,   ikon:M.mulaiIkon,   warna:M.mulaiWarna,   warnaTeks:M.mulaiWarnaTeks},
+    {el:$("bBelajar"), teks:MENU_TEKS.tombolBelajar, tampil:M.belajarTampil, ikon:M.belajarIkon, warna:M.belajarWarna, warnaTeks:M.belajarWarnaTeks}
+  ];
+  daftar.forEach(function(t){
+    var b=t.el;
+    b.textContent=(t.ikon||"")+t.teks;
+    b.style.display=t.tampil?"":"none";
+    b.style.fontSize=M.tombolUkuran+"px";
+    b.style.padding=M.tombolTinggi+"px";
+    b.style.borderRadius=M.tombolSudut+"px";
+    b.style.marginBottom=M.tombolJarak+"px";
+    b.style.textAlign=M.tombolRata;
+    b.style.width=M.tombolLebar;
+    b.style.marginLeft={left:"0",center:"auto",right:"auto"}[M.tombolRataTombol]||"auto";
+    b.style.marginRight={left:"auto",center:"auto",right:"0"}[M.tombolRataTombol]||"auto";
+    // warna lewat variabel supaya efek tekan tetap jalan
+    if(t.warna)b.style.setProperty("--acc",t.warna);
+    if(t.warnaTeks)b.style.setProperty("--acct",t.warnaTeks);
+  });
+}
+
+// Latar halaman: gambar/warna khusus hanya dipakai saat menu tampil
+function latarHalaman(id){
+  var s=document.body.style;
+  if(id==="menu"&&(MENU.latarGambar||MENU.latarWarna)){
+    s.background=(MENU.latarWarna||"")+(MENU.latarGambar?" url('"+MENU.latarGambar+"') center/"+MENU.latarFoto+" no-repeat fixed":"");
+  }else{
+    s.background="";
+  }
+}
+
+function tampil(id){
+  ["menu","study","game"].forEach(function(x){$(x).hidden=(x!==id)});
+  latarHalaman(id);
+}
+terapkanMenu();
+$("bKembali").textContent=TEKS.tombolKembali;
+$("bMenu").textContent=TEKS.tombolKembali;
+$("bMulai").onclick=function(){tampil("game");start()};
+$("bBelajar").onclick=function(){tampil("study")};
+$("bKembali").onclick=function(){tampil("menu")};
+$("bMenu").onclick=function(){tampil("menu")};
+tampil("menu");
 </script>
 </body>
 </html>
